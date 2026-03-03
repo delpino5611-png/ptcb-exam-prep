@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+================================================================================
+PTCB EXAM PREPARATION SYSTEM
+Copyright 2026 Michael Mordetsky. All Rights Reserved.
+================================================================================
+PROPRIETARY AND CONFIDENTIAL
+Licensed for personal use only. Commercial redistribution prohibited.
+================================================================================
+-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>PTCB Exam Prep</title>
+    <meta name="description" content="PTCB Pharmacy Technician Certification Exam Preparation System">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- PASSWORD GATE -->
+        <div id="passwordScreen" class="welcome-screen">
+            <h1>PTCB Exam Prep</h1>
+            <p>Enter your access code to begin</p>
+            <input type="password" id="accessCodeInput" class="name-input" placeholder="Enter access code..." autocomplete="off" />
+            <button class="btn btn-primary btn-large" onclick="verifyAccess()">Unlock</button>
+            <div id="accessError" class="error-msg hidden">Invalid access code. Please check your Etsy purchase confirmation.</div>
+        </div>
+
+        <!-- WELCOME / NAME SCREEN -->
+        <div id="welcomeScreen" class="welcome-screen hidden">
+            <h1>PTCB Exam Prep</h1>
+            <p>Your complete adaptive learning system for pharmacy technician certification</p>
+            <input type="text" id="nameInput" class="name-input" placeholder="Enter your name to begin..." />
+            <button class="btn btn-primary btn-large" onclick="startApp()">Begin Your Journey</button>
+        </div>
+
+        <!-- MAIN APP -->
+        <div id="mainApp" class="hidden">
+            <div class="app-header">
+                <div class="header-top">
+                    <div class="user-greeting">Hello, <span id="userName"></span>!</div>
+                    <div class="header-actions">
+                        <button class="icon-btn" id="darkModeToggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">
+                            <span id="darkModeIcon">&#9790;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="mode-selector" id="modeSelector">
+                    <button class="mode-btn active" data-mode="dashboard" onclick="setMode('dashboard', this)">Dashboard</button>
+                    <button class="mode-btn" data-mode="categories" onclick="setMode('categories', this)">Study by Topic</button>
+                    <button class="mode-btn" data-mode="adaptive" onclick="setMode('adaptive', this)">Adaptive Practice</button>
+                    <button class="mode-btn" data-mode="test" onclick="setMode('test', this)">Full Test</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- DASHBOARD -->
+                <div id="dashboardView">
+                    <h2>Your Learning Dashboard</h2>
+
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Questions</div>
+                            <div class="stat-number" id="totalQuestionsCount">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Completed</div>
+                            <div class="stat-number" id="completedCount">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Accuracy</div>
+                            <div class="stat-number" id="accuracyDisplay">0%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Study Streak</div>
+                            <div class="stat-number" id="streakCount">0</div>
+                        </div>
+                    </div>
+
+                    <div id="adaptiveSuggestions" class="suggestions-box hidden">
+                        <h3>Recommended for You</h3>
+                        <p class="text-muted">Based on your performance, we suggest focusing on:</p>
+                        <div id="suggestionsList"></div>
+                    </div>
+
+                    <div class="mastery-section">
+                        <h3>Topic Mastery</h3>
+                        <div class="mastery-grid" id="masteryGrid"></div>
+                    </div>
+
+                    <div class="dashboard-footer">
+                        <div id="lastStudyInfo" class="text-muted"></div>
+                        <div class="dashboard-actions">
+                            <button class="btn btn-sm btn-outline" onclick="exportProgress()">Export Progress</button>
+                            <label class="btn btn-sm btn-outline" style="cursor:pointer">
+                                Import Progress
+                                <input type="file" accept=".json" onchange="importProgress(event)" style="display:none">
+                            </label>
+                            <button class="btn btn-sm btn-danger" onclick="resetProgress()">Reset Progress</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATEGORIES -->
+                <div id="categoriesView" class="hidden">
+                    <h2>Choose Your Study Topic</h2>
+                    <p class="text-muted">Select a category to practice questions from that specific domain:</p>
+
+                    <div class="category-selector">
+                        <div class="category-btn" onclick="startCategoryPractice('Medications')">
+                            Medications<br><small class="text-muted">40% of exam</small>
+                        </div>
+                        <div class="category-btn" onclick="startCategoryPractice('Federal Requirements')">
+                            Federal Requirements<br><small class="text-muted">12.5% of exam</small>
+                        </div>
+                        <div class="category-btn" onclick="startCategoryPractice('Order Entry and Processing')">
+                            Order Entry<br><small class="text-muted">22.5% of exam</small>
+                        </div>
+                        <div class="category-btn" onclick="startCategoryPractice('Patient Safety and Quality Assurance')">
+                            Patient Safety<br><small class="text-muted">25% of exam</small>
+                        </div>
+                        <div class="category-btn" onclick="startCategoryPractice('Calculations')">
+                            Calculations<br><small class="text-muted">Math &amp; dosing</small>
+                        </div>
+                        <div class="category-btn" onclick="startCategoryPractice('Mixed')">
+                            Mixed Topics<br><small class="text-muted">All domains</small>
+                        </div>
+                        <div class="category-btn" onclick="startCategoryPractice('all')">
+                            All Questions<br><small class="text-muted">Full practice</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUIZ -->
+                <div id="quizView" class="hidden">
+                    <div class="feedback-mode-selector">
+                        <label>Answer Feedback:</label>
+                        <div class="toggle-buttons">
+                            <button class="toggle-btn active" id="toggleInstant" onclick="setFeedbackMode('instant', this)">
+                                Instant
+                            </button>
+                            <button class="toggle-btn" id="toggleExam" onclick="setFeedbackMode('exam', this)">
+                                Exam Mode
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-controls">
+                        <div>
+                            <span class="question-counter" id="questionCounter">Question 1 of 100</span>
+                        </div>
+                        <div class="quiz-controls-right">
+                            <div id="timerDisplay" class="timer-display hidden">
+                                <span id="timerIcon">&#9201;</span>
+                                <span id="timerText">00:00</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="setMode('dashboard')">Back</button>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+
+                    <div class="question-card">
+                        <div class="domain-badge" id="domainBadge"></div>
+                        <div class="question-text" id="questionText"></div>
+
+                        <div class="options" id="optionsContainer"></div>
+
+                        <div class="question-actions">
+                            <button class="btn btn-primary" id="checkBtn" onclick="handleAnswer()">Check Answer</button>
+                            <button class="btn btn-primary hidden" id="nextBtn" onclick="nextQuestion()">Next Question</button>
+                            <button class="btn btn-success hidden" id="finishBtn" onclick="showResults()">Finish &amp; See Results</button>
+                        </div>
+
+                        <div class="explanation" id="explanationBox">
+                            <h3 class="explanation-title">Explanation</h3>
+                            <p id="explanationText"></p>
+                        </div>
+                    </div>
+
+                    <div class="score-display">
+                        <div class="score-item">
+                            <div class="score-value" id="sessionCorrect">0</div>
+                            <div class="score-label">Correct</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-value" id="sessionIncorrect">0</div>
+                            <div class="score-label">Incorrect</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-value" id="sessionPercent">0%</div>
+                            <div class="score-label">Score</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS MODAL -->
+        <div id="resultsModal" class="results-modal hidden" role="dialog" aria-modal="true">
+            <div class="results-content">
+                <h2>Your Results</h2>
+                <div id="resultsStats"></div>
+                <h3>Review Your Answers:</h3>
+                <div id="resultsList"></div>
+                <div class="results-actions">
+                    <button class="btn btn-primary" onclick="closeResults()">Close</button>
+                    <button class="btn btn-success" onclick="retryQuiz()">Try Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COPYRIGHT -->
+    <footer class="copyright-footer">
+        <strong>PTCB Exam Prep &copy; 2026 Michael Mordetsky</strong><br>
+        <small>All Rights Reserved &bull; Licensed for Personal Use Only</small>
+    </footer>
+
+    <script src="js/questions.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

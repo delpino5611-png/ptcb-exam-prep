@@ -1,0 +1,24 @@
+{
+    "name": "PTCB Exam Prep",
+    "short_name": "PTCB Prep",
+    "description": "PTCB Pharmacy Technician Certification Exam Preparation System",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#f0f2ff",
+    "theme_color": "#667eea",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
